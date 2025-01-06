@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
@@ -140,6 +141,42 @@ def schedule_update(request):
             return redirect('lectures_schedule')
 
     return AdminScheduleUpdate(form=form).render(request)
+
+@require_http_methods(['GET'])
+def schedule_display_timer(request):
+    zosia = Zosia.objects.find_active()
+    try:
+        schedule = Schedule.objects.get(zosia=zosia)
+        data = schedule.schedule_data
+
+        day_start_time = zosia.start_date_unix_timestamp()
+        result = []
+        for day in data:
+            for lecture in day['events']:
+                def parse_time(time):
+                    parsed_time = datetime.strptime(time, "%H:%M")
+                    delta = parsed_time.hour*60*60 + parsed_time.minute*60
+                    if parsed_time.hour <= 4: # probably next day
+                        delta += 24*60*60
+                    return day_start_time + delta
+
+                author = lecture['lecturer'] if 'lecturer' in lecture else "N/A"
+                if 'showOrganization' in lecture and 'organization' in lecture and lecture['showOrganization']:
+                    author += f" ({lecture['organization']})"
+
+                result.append({
+                    "start": parse_time(lecture['startTime']),
+                    "end": parse_time(lecture['endTime']),
+                    "title": lecture['title'],
+                    "author": author,
+                })
+
+            day_start_time += 24*60*60
+
+        return JsonResponse({"events": result})
+
+    except Schedule.DoesNotExist:
+        return JsonResponse({"events": []})
 
 
 def load_durations(request):

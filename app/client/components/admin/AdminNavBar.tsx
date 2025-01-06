@@ -102,6 +102,10 @@ const navbarSections: AdminNavBarSection[] = [
         linkTitle: "Lectures export (for spreadsheet-scheduler) (CSV)",
         href: reverse("list_csv_lectures"),
       },
+      {
+        linkTitle: "Schedule --> export timer data (JSON)",
+        href: reverse("lectures_schedule_timer"),
+      },
       { linkTitle: "Shirts export (CSV)", href: reverse("export_shirts") },
       {
         linkTitle: "Preferences of registered users (CSV)",

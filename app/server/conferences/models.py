@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 import re
 
 from django.core.exceptions import ValidationError
@@ -170,6 +170,10 @@ class Zosia(models.Model):
     @property
     def end_date(self):
         return self.start_date + timedelta(days=3)
+
+    def start_date_unix_timestamp(self):
+        ZOSIA_TIMEZONE = 1*60*60
+        return datetime(*self.start_date.timetuple()[:3]).timestamp() - ZOSIA_TIMEZONE
 
     def __str__(self):
         return f'Zosia {self.start_date.year}'
