@@ -44,9 +44,19 @@ class RoomListAPITestCase(RoomsAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
-    def test_user_as_member_can_get_all_visible_rooms_with_own_visible_room(self):
+    def test_user_as_member_can_get_all_visible_rooms_with_own_room_when_single_member(self):
         self.client.force_authenticate(user=self.normal_1)
         self.room_1.join(self.normal_1)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+
+    def test_user_as_member_can_get_all_visible_rooms_with_own_room_when_many_members(self):
+        self.client.force_authenticate(user=self.normal_1)
+        self.room_2.join(self.normal_1)
+        self.room_2.join(self.staff_1)
 
         response = self.client.get(self.url)
 

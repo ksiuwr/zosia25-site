@@ -76,11 +76,11 @@ def web_build(with_collect_static: bool = True) -> None:
     # Builds Reactivated files for frontend
     print(f"{Colour.PURPLE}-- Building frontend --{Colour.NORMAL}")
 
-    docker_shell(["python", "manage.py", "generate_client_assets"])
-    docker_shell(["python", "manage.py", "build"])
+    docker_python(["generate_client_assets"])
+    docker_python(["build"])
 
     if with_collect_static:
-        docker_shell(["python", "manage.py", "collectstatic", "--noinput"])
+        docker_python(["collectstatic", "--noinput"])
 
 
 def setup(is_no_cache: bool, display_remind: bool = False) -> None:
@@ -97,8 +97,8 @@ def shutdown():
     docker_compose_run(["down"])
 
 
-def run_server(display_remind: bool = False, run_frontend_in_production_mode: bool = False) -> None:
-    if run_frontend_in_production_mode:
+def run_server(display_remind: bool = False, run_frontend_in_prod_mode: bool = False) -> None:
+    if run_frontend_in_prod_mode:
         web_build()
         docker_shell(["NODE_ENV=production", "gunicorn", "--bind", ":8000", "server.wsgi:application"])
     else:

@@ -4,6 +4,7 @@ import string
 
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -49,7 +50,7 @@ class RoomManager(models.Manager):
         return self.filter(hidden=False)
 
     def all_visible_with_member(self, user):
-        return self.filter(hidden=False) | self.filter(hidden=True, members__pk=user.pk)
+        return self.filter(Q(hidden=False) | Q(hidden=True, members__pk=user.pk)).distinct()
 
     def filter_visible(self, **params):
         if params.get("hidden"):

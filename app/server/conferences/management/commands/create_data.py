@@ -219,13 +219,14 @@ def create_random_user_with_preferences(zosia, id):
     return u
 
 
-def create_room(number):
+def create_room(number, hidden):
     if random.random() < 0.1:
         data = {
             'name': f"Nr. {number}",
             'description': lorem_ipsum.words(random.randint(3, 6)),
             'beds_double': 1,
             'available_beds_double': 1,
+            'hidden': hidden,
         }
     else:
         bed_single = random.randint(2, 6)
@@ -234,6 +235,7 @@ def create_room(number):
             'description': lorem_ipsum.words(random.randint(3, 6)),
             'beds_single': bed_single,
             'available_beds_single': random.randint(2, bed_single),
+            'hidden': hidden,
         }
     return Room.objects.create(**data)
 
@@ -310,8 +312,13 @@ class Command(BaseCommand):
 
         room_num = random.randint(10, 25)
         for i in range(1, room_num + 1):
-            create_room(i)
+            create_room(i, False)
             self.stdout.write(f"Created room #{i}")
+
+        hidden_room_num = random.randint(1, 4)
+        for i in range(100, hidden_room_num + 100):
+            create_room(i, True)
+            self.stdout.write(f"Created hidden room #{i}")
 
         sponsor_num = random.randint(5, 10)
         for i in range(1, sponsor_num + 1):
